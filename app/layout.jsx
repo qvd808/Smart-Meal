@@ -2,14 +2,12 @@
 
 import './globals.css';
 import NavBar from '../components/NavBar';
-import { Container } from 'reactstrap';
 import Footer from '../components/Footer';
-import React from 'react';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en">
+		<html lang="en" className="h-full">
 			<head>
 				<link
 					rel="stylesheet"
@@ -19,13 +17,24 @@ export default function RootLayout({ children }) {
 				/>
 				<link rel="stylesheet" href="https://cdn.auth0.com/js/auth0-samples-theme/1.0/css/auth0-theme.min.css" />
 			</head>
-			<body>
+			<body className="h-full flex flex-col">
 				<UserProvider>
-					<main id="app" className="d-flex flex-column h-100" data-testid="layout">
+					{/* Full-width Navbar */}
+					<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
 						<NavBar />
-						<Container className="flex-grow-1 mt-5">{children}</Container>
-						<Footer />
+					</div>
+
+					{/* Main Content */}
+					<main className="flex-grow pt-20 pb-40"> {/* Adjust padding based on navbar/footer height */}
+						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+							{children}
+						</div>
 					</main>
+
+					{/* Full-width Footer */}
+					<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+						<Footer />
+					</div>
 				</UserProvider>
 			</body>
 		</html>
