@@ -18,11 +18,10 @@ module.exports = {
 				'white': '#FAFAFA',
 				'black': '#1D1919',
 			  },
-		  fontFamily: {
-			lato: ['Lato', 'sans-serif'],
-			nunito: ['Nunito', 'sans-serif'],
-			mono: ['var(--font-supply)', 'monospace']
-		  }
+			  fontFamily: {
+				lato: "var(--font-lato)",
+				nunito: "var(--font-nunito)"
+			  }
 		}
 	},
 	plugins: [
