@@ -84,16 +84,16 @@ const ChatPage = () => {
 	return (
 		<div className="flex flex-col h-full flex-grow max-w-3xl mx-auto py-4 px-8">
 			{/* Header */}
-			<div className="mb-2">
-				<h1 className="text-2xl font-bold text-green-700 mb-1">Nutrition Chef</h1>
+			<div className="mb-1">
+				<h1 className="text-lg font-bold text-green-700">Nutrition Chef</h1>
 				<p className="text-gray-600">Get personalized recipes and nutrition advice</p>
 			</div>
 
 			{/* Chat Messages */}
-			<div className="overflow-scroll h-[400px] mb-4 bg-white rounded-lg shadow-inner p-4">
+			<div className="overflow-scroll h-[400px] mb-4 bg-white rounded-lg shadow-inner p-3 text-xs ">
 				{Array.isArray(messages) && messages.map((msg, i) => (
 					<div key={i} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-						<div className={`inline-block p-4 rounded-xl ${msg.role === 'user'
+						<div className={`inline-block p-3 rounded-xl ${msg.role === 'user'
 							? 'bg-green-600 text-white'
 							: 'bg-gray-100 text-gray-800'
 							} max-w-[90%] text-left`}>
@@ -122,13 +122,13 @@ const ChatPage = () => {
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
 					placeholder="Ask for a recipe or nutrition advice..."
-					className="flex-grow p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+					className="flex-grow p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
 					disabled={isLoading}
 				/>
 				<button
 					type="submit"
 					disabled={isLoading || !inputValue.trim()}
-					className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50"
+					className="bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50"
 				>
 					{isLoading ? 'Cooking...' : 'Send'}
 				</button>
@@ -181,7 +181,7 @@ const MessageBubble = ({ msg }) => {
 
 	if (recipe && recipe.type === "recipe") {
 		return (
-			<div className="bg-white rounded-lg shadow-md p-4 max-w-full">
+			<div className="bg-white rounded-lg shadow-md p-3 max-w-full text-xs">
 				<h2 className="text-lg font-bold text-green-700">{recipe.name}</h2>
 				<p className="text-gray-600 italic">{recipe.description}</p>
 
