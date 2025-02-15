@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import axios from 'axios';
 
 const ChatPage = () => {
 	// Initialize messages with empty array to prevent undefined
+	const { user, error, isLoadingAuth0 } = useUser();
+	console.log(user, error)
+
 	const [messages, setMessages] = useState(() => {
 		const initialMessage = {
 			role: 'assistant',
@@ -174,6 +179,19 @@ const MessageBubble = ({ msg }) => {
 	} else if (msg.content.includes("{") && msg.content.includes("}")) {
 		try {
 			recipe = extractAndParseJSON(msg.content);
+			if (user && recipe) {
+				axios
+					.post("/api/post_data", {
+						user,
+						recipe,
+					})
+					.then((response) => {
+						console.log("Recipe inserted into Supabase:", response.data);
+					})
+					.catch((error) => {
+						console.error("Error inserting recipe into Supabase:", error);
+					});
+			}
 		} catch (error) {
 			console.error("Error parsing JSON recipe:", error);
 		}
