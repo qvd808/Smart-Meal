@@ -94,8 +94,8 @@ const ChatPage = () => {
 				{Array.isArray(messages) && messages.map((msg, i) => (
 					<div key={i} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
 						<div className={`inline-block p-4 rounded-xl ${msg.role === 'user'
-								? 'bg-green-600 text-white'
-								: 'bg-gray-100 text-gray-800'
+							? 'bg-green-600 text-white'
+							: 'bg-gray-100 text-gray-800'
 							} max-w-[90%] text-left`}>
 							<MessageBubble msg={msg} />
 						</div>
@@ -137,21 +137,90 @@ const ChatPage = () => {
 	);
 };
 
-// Add MessageBubble component inside ChatPage
-const MessageBubble = ({ msg }) => {
-	if (msg.metadata?.type === 'recipe') {
+function extractAndParseJSON(text) {
+	// Handle markdown code blocks
+	const codeBlockRegex = /```(?:json)?\n([\s\S]*?)\n```/g;
+	const match = codeBlockRegex.exec(text);
+	// console.log(match)
+
+	if (match) {
 		try {
-			const recipe = JSON.parse(msg.content);
-			return (
-				<div className="recipe-card bg-white rounded-lg shadow-md p-4 max-w-full">
-					{/* Recipe content */}
-				</div>
-			);
-		} catch {
-			return <div className="text-red-500">Invalid recipe format</div>;
+			return JSON.parse(match[1]);
+		} catch (error) {
+			console.error("Failed to parse JSON from code block:", error);
 		}
 	}
 
+	// Fallback to original method if no code blocks
+	const jsonStart = text.indexOf('{');
+	const jsonEnd = text.lastIndexOf('}');
+
+	if (jsonStart === -1 || jsonEnd === -1) return null;
+
+	try {
+		return JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+	} catch (error) {
+		console.error("Invalid JSON:", error);
+		return null;
+	}
+}
+
+// Add MessageBubble component inside ChatPage
+const MessageBubble = ({ msg }) => {
+	// Try parsing JSON if it's a recipe
+	let recipe;
+	if (msg.metadata?.type === 'recipe') {
+		recipe = msg.content; // Directly use the object
+	} else if (msg.content.includes("{") && msg.content.includes("}")) {
+		try {
+			recipe = extractAndParseJSON(msg.content);
+		} catch (error) {
+			console.error("Error parsing JSON recipe:", error);
+		}
+	}
+
+	if (recipe && recipe.type === "recipe") {
+		return (
+			<div className="bg-white rounded-lg shadow-md p-4 max-w-full">
+				<h2 className="text-lg font-bold text-green-700">{recipe.name}</h2>
+				<p className="text-gray-600 italic">{recipe.description}</p>
+
+				<div className="mt-2">
+					<p><strong>Prep Time:</strong> {recipe.prep_time}</p>
+					<p><strong>Cook Time:</strong> {recipe.cook_time}</p>
+					<p><strong>Servings:</strong> {recipe.servings}</p>
+				</div>
+
+				<div className="mt-2">
+					<h3 className="font-bold text-gray-700">Ingredients:</h3>
+					<ul className="list-disc list-inside text-gray-800">
+						{recipe.ingredients.map((item, index) => (
+							<li key={index}>{item}</li>
+						))}
+					</ul>
+				</div>
+
+				<div className="mt-2">
+					<h3 className="font-bold text-gray-700">Instructions:</h3>
+					<ol className="list-decimal list-inside text-gray-800">
+						{recipe.instructions.map((step, index) => (
+							<li key={index}>{step}</li>
+						))}
+					</ol>
+				</div>
+
+				<div className="mt-2">
+					<h3 className="font-bold text-gray-700">Nutrition:</h3>
+					<p><strong>Calories:</strong> {recipe.nutrition.calories}</p>
+					<p><strong>Protein:</strong> {recipe.nutrition.protein}</p>
+					<p><strong>Carbs:</strong> {recipe.nutrition.carbs}</p>
+					<p><strong>Fat:</strong> {recipe.nutrition.fat}</p>
+				</div>
+			</div>
+		);
+	}
+
+	// Default text message
 	return (
 		<div className="whitespace-pre-wrap">
 			{msg.content.split('\n').map((line, i) => (
