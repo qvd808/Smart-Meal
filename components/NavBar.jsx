@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import PageLink from './PageLink'; // Assuming this is your custom link component
+import Image from "next/image";
 
 const NavBar = () => {
   const { user } = useUser();
-  const [currentPage, setCurrentPage] = useState(null); // Store the current page
+  const [currentPage, setCurrentPage] = useState(null);
 
   const handlePageChange = page => {
     setCurrentPage(page);
@@ -14,44 +15,59 @@ const NavBar = () => {
 
   return (
     <div className="nav-container" data-testid="navbar">
-      <nav className="px-5 w-full h-10 bg-pedals-yellow flex flex-row justify-between items-center font-nunito bg-deep-yellow">
-        <Link
-          href="/recipe-book"
-          className={`text-deep-brown hover:text-gray-700 transition duration-300 text-pedals-brown ${
-            currentPage === '/recipe-book' ? 'bg-white' : 'bg-transparent'
-          }`}
-          onClick={() => handlePageChange('/recipe-book')} // Set current page on click
-        >
-          <div className="py-2 px-4 rounded">Recipe Book</div> {/* Added padding and rounded corners */}
-        </Link>
-        <Link
-          href="/"
-          className={`text-deep-brown hover:text-gray-700 font-bold text-xl transition duration-300 text-pedals-brown ${
-            currentPage === '/' ? 'bg-white' : 'bg-transparent'
-          }`}
-          onClick={() => handlePageChange('/')} // Set current page on click
-        >
-          <div className="py-2 px-4 rounded">Smartie Chef</div> {/* Added padding and rounded corners */}
-        </Link>
+      <nav className="text-sm px-5 w-full h-10 bg-pedals-yellow flex flex-row justify-between items-stretch font-nunito bg-deep-yellow">
+        <div className="h-full flex items-center">
+          <Image
+                    src="/bookmark.png"
+                    alt="Crying Image"
+                    layout="responsive"
+                    height= "1"
+                    width= "1"
+                    className="object-contain"
+                  />
+          <Link
+            href="/recipe-book"
+            className={`h-full flex items-center px-4 text-deep-brown hover:text-gray-700 transition duration-300 text-pedals-brown ${
+              currentPage === '/recipe-book' ? 'bg-grey' : 'bg-transparent'
+            }`}
+            onClick={() => handlePageChange('/recipe-book')}
+          >
+            Recipe Book
+          </Link>
+        </div>
 
-        <div className="flex items-center">
+        <div className="h-full flex items-center">
+          <Link
+            href="/"
+            className={`h-full flex items-center px-4 text-deep-brown hover:text-gray-700 transition duration-300 text-pedals-brown ${
+              currentPage === '/' ? 'bg-grey' : 'bg-transparent'
+            }`}
+            onClick={() => handlePageChange('/')}
+          >
+            Smartie Chef
+          </Link>
+        </div>
+
+        <div className="h-full flex items-center">
           {user ? (
             <Link
               href="/profile"
               icon="user"
               testId="navbar-profile-desktop"
-              className={`text-deep-brown hover:text-gray-700 transition duration-300 text-pedals-brown ${
-                currentPage === '/profile' ? 'bg-white' : 'bg-transparent'
+              className={`h-full flex items-center px-4 text-deep-brown hover:text-gray-700 transition duration-300 text-pedals-brown ${
+                currentPage === '/profile' ? 'bg-grey' : 'bg-transparent'
               }`}
-              onClick={() => handlePageChange('/profile')}>
-              <div className="py-2 px-4 rounded">My Profile</div>
+              onClick={() => handlePageChange('/profile')}
+            >
+              My Profile
             </Link>
           ) : (
             <Link
               href="/api/auth/login"
-              className="btn btn-primary btn-block"
+              className="h-full flex items-center px-4 bg-deep-brown text-white hover:bg-opacity-90 transition duration-300"
               tabIndex={0}
-              testId="navbar-login-mobile">
+              testId="navbar-login-mobile"
+            >
               Log in
             </Link>
           )}
