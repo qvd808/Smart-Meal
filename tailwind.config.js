@@ -10,8 +10,20 @@ module.exports = {
 	],
 	theme: {
 		extend: {
-			// Add custom theme extensions here
-		},
+			colors: {
+				'deep-brown': '#431414',
+				'deep-yellow': '#F4EB68',
+				'light-yellow': '#F8FFC5',
+				'grey': '#ECECEC',
+				'white': '#FAFAFA',
+				'black': '#1D1919',
+			  },
+		  fontFamily: {
+			lato: ['Lato', 'sans-serif'],
+			nunito: ['Nunito', 'sans-serif'],
+			mono: ['var(--font-supply)', 'monospace']
+		  }
+		}
 	},
 	plugins: [
 		// Add plugins here
