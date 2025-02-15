@@ -1,39 +1,67 @@
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
+import { NextResponse } from 'next/server';
+import axios from 'axios';
+
+const systemMessage = {
+	role: "system",
+	content: `You are a nutrition expert assistant. Follow these rules:
+1. When providing recipes, use EXACTLY this JSON format:
+{
+  "type": "recipe",
+  "name": "Recipe name",
+  "description": "1-sentence description",
+  "prep_time": "X mins",
+  "cook_time": "X mins",
+  "servings": X,
+  "ingredients": ["1 cup ingredient", ...],
+  "instructions": ["Step 1...", "Step 2..."],
+  "nutrition": {
+    "calories": "XXX kcal",
+    "protein": "XXg",
+    "carbs": "XXg",
+    "fat": "XXg"
+  }
+}
+
+2. Validate JSON syntax before responding
+3. For non-recipe responses, use regular text
+4. Never mix JSON with text
+5. Ingredients must include quantities
+6. Keep instructions under 6 steps
+7. Include cooking times and servings
+8. Nutritional info per serving
+
+Current date: ${new Date().toISOString().split('T')[0]}`
+};
+
+function validateRecipe(recipe) {
+	return (
+		recipe.type === 'recipe' &&
+		recipe.name &&
+		recipe.ingredients?.length > 0 &&
+		recipe.instructions?.length > 0
+	);
+}
 
 export async function POST(req) {
 	try {
-		const body = await req.json();
-		const userMessage = body.message; // New user message from client
-		const history = body.history || []; // Existing conversation history
+		const { message: userMessage, history = [] } = await req.json();
 
 		if (!userMessage) {
-			return NextResponse.json(
-				{ error: "Please provide a message" },
-				{ status: 403 }
-			);
+			return NextResponse.json({ error: "Message required" }, { status: 400 });
 		}
 
-		// System message configuration
-		const systemMessage = {
-			role: "system",
-			content: "Be precise and concise."
-		};
-
-		// Construct messages array with system message, history, and new user message
-		let messages = [
+		const messages = [
 			systemMessage,
 			...history,
 			{ role: "user", content: userMessage }
 		];
 
-		// API call to Perplexity
 		const response = await axios.post(
 			"https://api.perplexity.ai/chat/completions",
 			{
 				model: "sonar",
 				messages: messages,
-				max_tokens: 123,
+				max_tokens: 1000,
 				temperature: 0.2,
 				top_p: 0.9,
 				search_domain_filter: null,
@@ -54,38 +82,37 @@ export async function POST(req) {
 			}
 		);
 
-		// Extract assistant's response
 		const assistantContent = response.data.choices[0].message.content;
-		const assistantMessage = {
-			role: "assistant",
-			content: assistantContent
-		};
+		let metadata = { type: 'text' };
+		let parsedContent = assistantContent;
 
-		// Append assistant response to messages
-		messages.push(assistantMessage);
-
-		// Trim history to retain last 10 conversations (20 messages after system)
-		if (messages.length > 21) {
-			const recentMessages = messages.slice(1).slice(-20); // Remove system & get last 20
-			messages = [systemMessage, ...recentMessages];
+		try {
+			const potentialRecipe = JSON.parse(assistantContent);
+			if (validateRecipe(potentialRecipe)) {
+				metadata.type = 'recipe';
+				parsedContent = potentialRecipe;
+			}
+		} catch {
+			// Not JSON, continue as text
 		}
 
-		// Prepare updated history (excluding system message for client)
-		const newHistory = messages.slice(1);
-
-		return NextResponse.json(
+		const newHistory = [
+			...history,
+			{ role: "user", content: userMessage },
 			{
-				history: newHistory, // Send back updated history
-				response: response.data
-			},
-			{ status: 200 }
-		);
+				role: "assistant",
+				content: assistantContent,
+				metadata
+			}
+		];
+
+		return NextResponse.json({ history: newHistory }, { status: 200 });
 
 	} catch (error) {
-		console.error("Error:", error.response?.data || error.message);
+		console.error('Error:', error);
 		return NextResponse.json(
-			{ error: error.response?.data || "An error occurred" },
-			{ status: error.response?.status || 500 }
+			{ error: "Service unavailable. Please try again later." },
+			{ status: 503 }
 		);
 	}
 }

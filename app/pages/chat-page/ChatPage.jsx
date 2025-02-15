@@ -1,109 +1,113 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const ChatPage = () => {
-	const [messages, setMessages] = useState([]);
+	// Initialize messages with empty array to prevent undefined
+	const [messages, setMessages] = useState(() => {
+		const initialMessage = {
+			role: 'assistant',
+			content: "Hello! I'm your nutrition assistant. Ask me for recipes or nutritional advice!",
+			metadata: { type: 'text' }
+		};
+		return [initialMessage]; // Ensure initial array is never empty
+	});
+
 	const [inputValue, setInputValue] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-
 	const messagesEndRef = useRef(null);
 
-	// Auto-scroll to bottom when new messages are added
+	// Scroll handling
 	useEffect(() => {
-		scrollToBottom();
-	}, [messages]);
-
-	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-	};
+	}, [messages]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!inputValue.trim() || isLoading) return;
 
-		if (inputValue.trim() === '') return;
-
-		// Add user message to chat UI immediately
+		// Create new messages array safely
 		const userMessage = {
 			role: 'user',
-			content: inputValue
+			content: inputValue,
+			metadata: { type: 'text' }
 		};
 
-		setMessages(prevMessages => [...prevMessages, userMessage]);
+		setMessages(prev => {
+			// Ensure we're always working with an array
+			const safePrev = Array.isArray(prev) ? prev : [];
+			return [...safePrev, userMessage];
+		});
+
 		setInputValue('');
 		setIsLoading(true);
 
 		try {
-			// Call your API endpoint
 			const response = await fetch('/api/chat', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					message: userMessage.content,
-					history: messages.map(msg => ({
-						role: msg.role,
-						content: msg.content
-					}))
+					message: inputValue,
+					history: messages.filter(msg => msg.role !== 'assistant') // Skip initial message
 				})
 			});
 
 			if (!response.ok) {
-				throw new Error('Network response was not ok');
+				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 
 			const data = await response.json();
 
-			// Update messages with the complete history returned from the API
-			setMessages(data.history);
-			setIsLoading(false);
-
+			// Ensure received history is valid
+			if (Array.isArray(data?.history)) {
+				setMessages(data.history);
+			} else {
+				throw new Error('Invalid response format');
+			}
 		} catch (error) {
-			console.error('Error:', error);
-			setIsLoading(false);
-
-			// Show error message in chat
-			setMessages(prevMessages => [
-				...prevMessages,
-				{
+			console.error('Fetch error:', error);
+			setMessages(prev => {
+				const safePrev = Array.isArray(prev) ? prev : [];
+				return [...safePrev, {
 					role: 'assistant',
-					content: 'Sorry, an error occurred. Please try again.'
-				}
-			]);
+					content: 'Sorry, something went wrong. Please try again.',
+					metadata: { type: 'text' }
+				}];
+			});
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
-	return (
-		<div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
-			<h1 className="text-2xl font-bold mb-4">Chat</h1>
+	// Rest of your component remains the same...
+	// [Keep the RecipeCard and MessageBubble components]
+	// [Keep the JSX structure]
 
-			{/* Chat messages container */}
-			<div className="flex-grow overflow-auto mb-4 border rounded-lg p-4 bg-gray-50">
-				{messages.length === 0 ? (
-					<p className="text-gray-500 italic">Start a conversation...</p>
-				) : (
-					messages.map((msg, index) => (
-						<div
-							key={index}
-							className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}
-						>
-							<div
-								className={`inline-block p-3 rounded-lg ${msg.role === 'user'
-										? 'bg-blue-500 text-white'
-										: 'bg-gray-200 text-gray-800'
-									}`}
-							>
-								{msg.content}
-							</div>
+	return (
+		<div className="flex flex-col h-screen max-w-3xl mx-auto p-4">
+			{/* Header */}
+			<div className="mb-6">
+				<h1 className="text-3xl font-bold text-green-700 mb-1">Nutrition Chef</h1>
+				<p className="text-gray-600">Get personalized recipes and nutrition advice</p>
+			</div>
+
+			{/* Chat Messages */}
+			<div className="flex-grow overflow-auto mb-4 bg-white rounded-lg shadow-inner p-4">
+				{Array.isArray(messages) && messages.map((msg, i) => (
+					<div key={i} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+						<div className={`inline-block p-4 rounded-xl ${msg.role === 'user'
+								? 'bg-green-600 text-white'
+								: 'bg-gray-100 text-gray-800'
+							} max-w-[90%] text-left`}>
+							<MessageBubble msg={msg} />
 						</div>
-					))
-				)}
+					</div>
+				))}
 				{isLoading && (
 					<div className="text-left mb-4">
-						<div className="inline-block p-3 rounded-lg bg-gray-200 text-gray-800">
-							<div className="flex items-center">
-								<div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse mr-1"></div>
-								<div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse mr-1" style={{ animationDelay: '0.2s' }}></div>
-								<div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+						<div className="inline-block p-4 rounded-xl bg-gray-100">
+							<div className="flex items-center space-x-2 text-gray-500">
+								<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+								<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-100"></div>
+								<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-200"></div>
 							</div>
 						</div>
 					</div>
@@ -111,24 +115,51 @@ const ChatPage = () => {
 				<div ref={messagesEndRef} />
 			</div>
 
-			{/* Input form */}
-			<form onSubmit={handleSubmit} className="flex">
+			{/* Input Form */}
+			<form onSubmit={handleSubmit} className="flex gap-2">
 				<input
 					type="text"
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
-					placeholder="Type your message..."
-					className="flex-grow mr-2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+					placeholder="Ask for a recipe or nutrition advice..."
+					className="flex-grow p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
 					disabled={isLoading}
 				/>
 				<button
 					type="submit"
 					disabled={isLoading || !inputValue.trim()}
-					className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+					className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50"
 				>
-					Send
+					{isLoading ? 'Cooking...' : 'Send'}
 				</button>
 			</form>
+		</div>
+	);
+};
+
+// Add MessageBubble component inside ChatPage
+const MessageBubble = ({ msg }) => {
+	if (msg.metadata?.type === 'recipe') {
+		try {
+			const recipe = JSON.parse(msg.content);
+			return (
+				<div className="recipe-card bg-white rounded-lg shadow-md p-4 max-w-full">
+					{/* Recipe content */}
+				</div>
+			);
+		} catch {
+			return <div className="text-red-500">Invalid recipe format</div>;
+		}
+	}
+
+	return (
+		<div className="whitespace-pre-wrap">
+			{msg.content.split('\n').map((line, i) => (
+				<React.Fragment key={i}>
+					{line}
+					{i < msg.content.split('\n').length - 1 && <br />}
+				</React.Fragment>
+			))}
 		</div>
 	);
 };
