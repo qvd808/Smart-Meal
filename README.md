@@ -1,116 +1,75 @@
-# Auth0 Next.js SDK Sample Application
+# SmartMeal - Your AI Recipe Recommendation Engine
 
-This sample demonstrates the integration of [Auth0 Next.js SDK](https://github.com/auth0/nextjs-auth0) into a Next.js application created using [create-next-app](https://nextjs.org/docs/api-reference/create-next-app). The sample is a companion to the [Auth0 Next.js SDK Quickstart](https://auth0.com/docs/quickstart/webapp/nextjs).
+Tired of recipe boredom and endless scrolling? We were too. SmartMeal was inspired by the frustration of finding truly delicious and personalized meal ideas.
 
-This sample demonstrates the following use cases:
+## What it does
 
-- [Login](https://github.com/auth0-samples/auth0-nextjs-samples/blob/main/Sample-01/components/NavBar.jsx#L61-L67)
-- [Logout](https://github.com/auth0-samples/auth0-nextjs-samples/blob/main/Sample-01/components/NavBar.jsx#L93-L95)
-- [Showing the user profile](https://github.com/auth0-samples/auth0-nextjs-samples/blob/main/Sample-01/pages/profile.jsx)
-- [Protecting client-side rendered pages](https://github.com/auth0-samples/auth0-nextjs-samples/blob/main/Sample-01/pages/profile.jsx#L43-L46)
-- [Calling APIs](https://github.com/auth0-samples/auth0-nextjs-samples/blob/main/Sample-01/pages/external.jsx)
+SmartMeal is your personal AI recipe recommendation engine. Tell us your taste and dietary needs, and we instantly suggest craveable recipes tailored just for you. Discover new favorites and simplify meal planning!
 
-## Project setup
+## How we built it
 
-Use `npm` to install the project dependencies:
+We built SmartMeal using:
 
-```bash
-npm install
-```
+*   **Backend:** NextJS
+*   **Frontend:** React
+*   **Database:** PostgreSQL
+*   **AI Recommendation Engine:** Perplexity AI
 
-## Configuration
+## Challenges we ran into
 
-### Create an API
+Building a truly personalized engine with a limited initial recipe database was a challenge. We overcame this by focusing on smart algorithms and user feedback to ensure relevant recommendations from day one.
 
-For the **External API** page to work, you will need to [create an API](https://auth0.com/docs/authorization/apis) using the [management dashboard](https://manage.auth0.com/#/apis). This will give you an API Identifier that you can use in the `AUTH0_AUDIENCE` environment variable below. Then you will need to [add a permission](https://auth0.com/docs/get-started/dashboard/add-api-permissions) named `read:shows` to your API. To get your app to ask for that permission, include it in the value of the `AUTH0_SCOPE` environment variable.
+## Accomplishments that we're proud of
 
-If you do not wish to use an API or observe the API call working, you should not specify the `AUTH0_AUDIENCE` and `AUTH0_SCOPE` values in the next steps.
+We're proud to have a functional MVP that delivers personalized recipes, a smooth user experience, and a working AI recommendation engine. The core features are all working and ready for user testing!
 
-### Configure credentials
+## What we learned
 
-The project needs to be configured with your Auth0 Domain, Client ID and Client Secret for the authentication flow to work.
+We learned valuable lessons about applying machine learning to recommendations, the importance of MVP feature prioritization, and the power of user-centric design even in early development.
 
-To do this, first copy `.env.local.example` into a new file in the same folder called `.env.local`, and replace the values with your own Auth0 application credentials (see more info about [loading environmental variables in Next.js](https://nextjs.org/docs/basic-features/environment-variables)):
+## What's next for SmartMeal
 
-```sh
-# A long secret value used to encrypt the session cookie
-AUTH0_SECRET='LONG_RANDOM_VALUE'
-# The base url of your application
-AUTH0_BASE_URL='http://localhost:3000'
-# The url of your Auth0 tenant domain
-AUTH0_ISSUER_BASE_URL='https://YOUR_AUTH0_DOMAIN.auth0.com'
-# Your Auth0 application's Client ID
-AUTH0_CLIENT_ID='YOUR_AUTH0_CLIENT_ID'
-# Your Auth0 application's Client Secret
-AUTH0_CLIENT_SECRET='YOUR_AUTH0_CLIENT_SECRET'
-# Your Auth0 API's Identifier 
-# OMIT if you do not want to use the API part of the sample
-AUTH0_AUDIENCE='YOUR_AUTH0_API_IDENTIFIER'
-# The permissions your app is asking for
-# OMIT if you do not want to use the API part of the sample
-AUTH0_SCOPE='openid profile email read:shows'
-```
+Next for SmartMeal:
 
-**Note**: Make sure you replace `AUTH0_SECRET` with your own secret (you can generate a suitable string using `openssl rand -hex 32` on the command line).
+*   Expand our recipe database.
+*   Enhance our AI for smarter suggestions.
+*   Add meal planning features.
+*   Integrate with our previous project, SmartExpense! This means SmartMeal will estimate recipe costs, and you can track actual spending via SmartExpense. This powerful combination will help you eat better and manage your food budget effectively.
 
-## Run the sample
+## Getting Started
 
-### Compile and hot-reload for development
+To run SmartMeal locally, follow these steps:
 
-This compiles and serves the Next.js app and starts the API server on port 3001.
+1.  **Clone the repository:**
 
-```bash
-npm run dev
-```
+    ```bash
+    git clone [repository_url]
+    ```
 
-## Deployment
+2.  **Navigate to the project directory:**
 
-### Compiles and minifies for production
+    ```bash
+    cd SmartMeal
+    ```
 
-```bash
-npm run build
-```
+3.  **Install dependencies:**
 
-### Docker build
+    ```bash
+    npm install
+    ```
 
-To build and run the Docker image, run `exec.sh`, or `exec.ps1` on Windows.
+4.  **Run the development server:**
 
-### Run the unit tests
+    ```bash
+    npm run dev
+    ```
 
-```bash
-npm run test
-```
+    This will start the development server, and you should be able to access SmartMeal in your browser.  The default port is usually `http://localhost:3000`.
 
-### Run the integration tests
+## Contributing
 
-```bash
-npm run test:integration
-```
-
-## What is Auth0?
-
-Auth0 helps you to:
-
-* Add authentication with [multiple sources](https://auth0.com/docs/identityproviders), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider**.
-* Add authentication through more traditional **[username/password databases](https://auth0.com/docs/connections/database/custom-db)**.
-* Add support for **[linking different user accounts](https://auth0.com/docs/users/user-account-linking)** with the same user.
-* Support for generating signed [JSON Web Tokens](https://auth0.com/docs/tokens/json-web-tokens) to call your APIs and **flow the user identity** securely.
-* Analytics of how, when, and where users are logging in.
-* Pull data from other sources and add it to the user profile through [JavaScript rules](https://auth0.com/docs/rules).
-
-## Create a Free Auth0 Account
-
-1. Go to [Auth0](https://auth0.com) and click **Sign Up**.
-2. Use Google, GitHub, or Microsoft Account to login.
-
-## Issue Reporting
-
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
-
-## Author
-
-[Auth0](https://auth0.com)
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT license. See the [LICENSE](./LICENSE) file for more info.
+[License information]
