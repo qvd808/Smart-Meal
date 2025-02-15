@@ -2,12 +2,12 @@
 
 import './globals.css';
 import NavBar from '../components/NavBar';
-import Footer from '../components/Footer';
+
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en" className="h-full">
+		<html lang="en" className="h-[100vh]">
 			<head>
 				<link
 					rel="stylesheet"
@@ -25,16 +25,13 @@ export default function RootLayout({ children }) {
 					</div>
 
 					{/* Main Content */}
-					<main className="flex-grow pt-20 pb-40"> {/* Adjust padding based on navbar/footer height */}
+					<main className="flex-grow"> {/* Adjust padding based on navbar/footer height */}
 						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 							{children}
 						</div>
 					</main>
 
-					{/* Full-width Footer */}
-					<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-						<Footer />
-					</div>
+					
 				</UserProvider>
 			</body>
 		</html>

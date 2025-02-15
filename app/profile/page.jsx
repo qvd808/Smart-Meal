@@ -16,7 +16,7 @@ function Profile() {
       {isLoading && <Loading />}
       {user && (
         <>
-          <div className="align-items-center profile-header mb-5 text-center text-md-left d-flex flex-column align-items-center"> {/* Add flex properties */}
+          <div className="pt-20 align-items-center profile-header mb-5 text-center text-md-left d-flex flex-column align-items-center"> {/* Add flex properties */}
     <div>
         <img
             src={user.picture}

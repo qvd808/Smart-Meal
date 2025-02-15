@@ -18,10 +18,7 @@ module.exports = {
 				'white': '#FAFAFA',
 				'black': '#1D1919',
 			  },
-			  fontFamily: {
-				lato: "var(--font-lato)",
-				nunito: "var(--font-nunito)"
-			  }
+			  
 		}
 	},
 	plugins: [

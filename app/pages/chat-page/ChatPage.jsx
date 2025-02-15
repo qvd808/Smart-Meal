@@ -82,7 +82,7 @@ const ChatPage = () => {
 	// [Keep the JSX structure]
 
 	return (
-		<div className="flex flex-col h-screen max-w-3xl mx-auto p-4">
+		<div className="flex flex-col h-full flex-grow max-w-3xl mx-auto p-4">
 			{/* Header */}
 			<div className="mb-6">
 				<h1 className="text-3xl font-bold text-green-700 mb-1">Nutrition Chef</h1>
@@ -90,7 +90,7 @@ const ChatPage = () => {
 			</div>
 
 			{/* Chat Messages */}
-			<div className="flex-grow overflow-auto mb-4 bg-white rounded-lg shadow-inner p-4">
+			<div className="overflow-scroll h-[450px] mb-4 bg-white rounded-lg shadow-inner p-4">
 				{Array.isArray(messages) && messages.map((msg, i) => (
 					<div key={i} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
 						<div className={`inline-block p-4 rounded-xl ${msg.role === 'user'
